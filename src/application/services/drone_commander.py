@@ -26,44 +26,45 @@ class DroneCommander:
 		self.screen_width = 800
 		self.screen_height = 600
 
-	def handle_keydown(self, event_key, distance: int = 20):
+	def handle_keydown(self, event_key, distance: int = 40):
 		if event_key == pygame.K_w:
 			print('w')
-			self.command_queue.put(("w", 20))
-			self.speaking_service.text_to_voice("You have moved forward")
+			self.command_queue.put(("w", distance))
+			self.speaking_service.text_to_voice(f"You have moved forward {distance} centimeters")
 		if event_key == pygame.K_a:
 			print('a')
-			self.command_queue.put(("a", 20))
-			self.speaking_service.text_to_voice("You have moved left")
+			self.command_queue.put(("a", distance))
+			self.speaking_service.text_to_voice(f"You have moved left {distance} centimeters")
 		elif event_key == pygame.K_s:
 			print('s')
-			self.command_queue.put(("s", 20))
-			self.speaking_service.text_to_voice("You have moved backward")
+			self.command_queue.put(("s", distance))
+			self.speaking_service.text_to_voice(f"You have moved backward {distance} centimeters")
 		elif event_key == pygame.K_d:
 			print('d')
-			self.command_queue.put(("d", 20))
-			self.speaking_service.text_to_voice("You have moved right")
+			self.command_queue.put(("d", distance))
+			self.speaking_service.text_to_voice(f"You have moved right {distance} centimeters")
 		elif event_key == pygame.K_UP:
 			print('+')
-			self.command_queue.put(("+", 20))
-			self.speaking_service.text_to_voice("You have moved up")
+			self.command_queue.put(("+", distance))
+			self.speaking_service.text_to_voice(f"You have moved up {distance} centimeters")
 		elif event_key == pygame.K_DOWN:
 			print('-')
-			self.command_queue.put(("-", 20))
-			self.speaking_service.text_to_voice("You have moved down")
+			self.command_queue.put(("-", distance))
+			self.speaking_service.text_to_voice(f"You have moved down {distance} centimeters")
 		elif event_key == pygame.K_r:
 			print('r')
-			self.command_queue.put(("rotate_right", 180))
-			self.speaking_service.text_to_voice("You have rotated right 180 degrees")
+			self.command_queue.put(("rotate_right", 90))
+			self.speaking_service.text_to_voice("You have rotated right 90 degrees")
 		elif event_key == pygame.K_l:
 			print('l')
-			self.command_queue.put(("rotate_left", 180))
-			self.speaking_service.text_to_voice("You have rotated left 180 degrees")
+			self.command_queue.put(("rotate_left", 90))
+			self.speaking_service.text_to_voice("You have rotated left 90 degrees")
 
 	def handle_stop(self):
 		self.running = False
 		print("You have pressed 'del'")
 		self.command_queue.put(("del", None))
+		self.speaking_service.text_to_voice("You have landed the drone")
 		cv2.destroyAllWindows()
 
 	def start_up_config(self):
