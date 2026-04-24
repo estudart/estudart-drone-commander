@@ -4,12 +4,19 @@ from queue import Queue
 from typing import Optional, Tuple
 
 from src.infrastructure.tello_adapter import TelloAdapter
+from src.application.services.logging_service import LoggingService
 
 class CommandWorker:
 	"""Consumes commands from a queue and forwards them to the drone adapter."""
 
-	def __init__(self, tello_adapter: TelloAdapter, command_queue: Queue[Tuple[str, Optional[int]]]):
+	def __init__(
+		self,
+		tello_adapter: TelloAdapter,
+		logging_service: LoggingService,
+		command_queue: Queue[Tuple[str, Optional[int]]],
+	) -> None:
 		self.tello_adapter = tello_adapter
+		self.logging_service = logging_service
 		self.command_queue = command_queue
 		self.max_retries = 3
 		self.running = False
@@ -19,9 +26,10 @@ class CommandWorker:
 		retries = 0
 		while retries < self.max_retries:
 			if self.tello_adapter.take_off():
+				self.logging_service.info("Takeoff successful")
 				return
 			retries += 1
-		print("Max retries for take off")
+		self.logging_service.error("Max retries for take off")
 
 	def handle_stop(self) -> None:
 		self.running = False
@@ -56,5 +64,5 @@ class CommandWorker:
 			self.handle_event(command=command, distance=distance)
 
 			if command == 'del':
-				print('landing drone')
+				self.logging_service.info("Landing drone")
 				self.handle_stop()
