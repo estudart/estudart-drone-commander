@@ -72,6 +72,8 @@ class DroneCommander:
 
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN:
+					battery = self.tello_adapter.get_battery()
+					print(f"battery: {battery}%")
 					if event.key == pygame.K_0:
 						self.handle_stop()
 						break

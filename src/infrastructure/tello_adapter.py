@@ -15,7 +15,7 @@ class TelloAdapter:
             print(err)
             raise
 
-    def get_battery(self):
+    def get_battery(self) -> int:
         return self.tello.get_battery()
 
     def stream_on(self) -> bool:
