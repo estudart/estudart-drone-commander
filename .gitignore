@@ -1,0 +1,7 @@
+# Ignore virtual env files
+/venv
+/server/venv
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache
