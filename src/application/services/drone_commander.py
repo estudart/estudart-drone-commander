@@ -7,10 +7,18 @@ import cv2
 
 from src.infrastructure.tello_adapter import TelloAdapter
 from src.application.services.command_worker import CommandWorker
+from src.application.services.speaking_service import SpeakingService
 
 class DroneCommander:
-	def __init__(self, tello_adapter: TelloAdapter, command_worker: CommandWorker, command_queue: Queue):
+	def __init__(
+		self, 
+		tello_adapter: TelloAdapter,
+		speaking_service: SpeakingService,
+		command_worker: CommandWorker,
+		command_queue: Queue
+	):
 		self.tello_adapter = tello_adapter
+		self.speaking_service = speaking_service
 		self.command_worker = command_worker
 		self.command_queue = command_queue
 		pygame.init()
@@ -22,27 +30,35 @@ class DroneCommander:
 		if event_key == pygame.K_w:
 			print('w')
 			self.command_queue.put(("w", 20))
+			self.speaking_service.text_to_voice("You have moved forward")
 		if event_key == pygame.K_a:
 			print('a')
 			self.command_queue.put(("a", 20))
+			self.speaking_service.text_to_voice("You have moved left")
 		elif event_key == pygame.K_s:
 			print('s')
 			self.command_queue.put(("s", 20))
+			self.speaking_service.text_to_voice("You have moved backward")
 		elif event_key == pygame.K_d:
 			print('d')
 			self.command_queue.put(("d", 20))
+			self.speaking_service.text_to_voice("You have moved right")
 		elif event_key == pygame.K_UP:
 			print('+')
 			self.command_queue.put(("+", 20))
+			self.speaking_service.text_to_voice("You have moved up")
 		elif event_key == pygame.K_DOWN:
 			print('-')
 			self.command_queue.put(("-", 20))
+			self.speaking_service.text_to_voice("You have moved down")
 		elif event_key == pygame.K_r:
 			print('r')
 			self.command_queue.put(("rotate_right", 180))
+			self.speaking_service.text_to_voice("You have rotated right 180 degrees")
 		elif event_key == pygame.K_l:
 			print('l')
-			self.command_queue.put(("l", 180))
+			self.command_queue.put(("rotate_left", 180))
+			self.speaking_service.text_to_voice("You have rotated left 180 degrees")
 
 	def handle_stop(self):
 		self.running = False

@@ -107,3 +107,6 @@ class TelloAdapter:
 
     def rotate_right(self, degrees: int):
         self.tello.rotate_clockwise(180)
+
+    def rotate_left(self, degrees: int):
+        self.tello.rotate_counter_clockwise(180)

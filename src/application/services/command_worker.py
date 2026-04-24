@@ -30,6 +30,8 @@ class CommandWorker:
 			self.tello_adapter.take_off()
 		elif command == 'rotate_right':
 			self.tello_adapter.rotate_right(distance)
+		elif command == 'rotate_left':
+			self.tello_adapter.rotate_left(distance)
 	
 	def start_loop(self):
 		self.running = True
