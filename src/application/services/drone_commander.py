@@ -26,7 +26,7 @@ class DroneCommander:
 		self.screen_width = 800
 		self.screen_height = 600
 
-	def handle_keydown(self, event_key, distance: int = 40):
+	def handle_keydown(self, event_key, distance: int = 60):
 		if event_key == pygame.K_w:
 			print('w')
 			self.command_queue.put(("w", distance))

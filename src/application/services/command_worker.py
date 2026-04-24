@@ -6,7 +6,15 @@ class CommandWorker:
 	def __init__(self, tello_adapter: TelloAdapter, command_queue: Queue):
 		self.tello_adapter = tello_adapter
 		self.command_queue = command_queue
+		self.max_retries = 3
 		self.running = False
+
+	def take_off_retry(self):
+		retries = 0
+		is_take_off = self.tello_adapter.take_off()
+		while not retries < self.max_retries:
+			self.tello_adapter.take_off()
+		print("Max retries for take off")
 
 	def handle_stop(self):
 		self.running = False
@@ -27,7 +35,7 @@ class CommandWorker:
 		elif command == '-':
 			self.tello_adapter.move_down(distance)
 		elif command == 'take_off':
-			self.tello_adapter.take_off()
+			self.take_off_retry()
 		elif command == 'rotate_right':
 			self.tello_adapter.rotate_right(distance)
 		elif command == 'rotate_left':
