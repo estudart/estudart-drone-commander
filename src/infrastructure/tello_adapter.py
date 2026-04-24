@@ -1,16 +1,21 @@
+from __future__ import annotations
+
 import time
+from typing import Optional
+
 from djitellopy import Tello
 
 
 class TelloAdapter:
-    def __init__(self):
+    """Thin adapter around `djitellopy.Tello` to keep the rest of the app clean."""
+
+    def __init__(self) -> None:
         self.tello = Tello()
         self._connect()
 
-    def _connect(self):
+    def _connect(self) -> None:
         try:
             self.tello.connect()
-            return True
         except Exception as err:
             print(err)
             raise
@@ -39,6 +44,7 @@ class TelloAdapter:
             return self.tello.get_frame_read()
         except Exception as err:
             print(err)
+            raise
 
     def take_off(self) -> bool:
         try:
@@ -105,8 +111,18 @@ class TelloAdapter:
             print(err)
             return False
 
-    def rotate_right(self, degrees: int):
-        self.tello.rotate_clockwise(degrees)
+    def rotate_right(self, degrees: int) -> bool:
+        try:
+            self.tello.rotate_clockwise(degrees)
+            return True
+        except Exception as err:
+            print(err)
+            return False
 
-    def rotate_left(self, degrees: int):
-        self.tello.rotate_counter_clockwise(degrees)
+    def rotate_left(self, degrees: int) -> bool:
+        try:
+            self.tello.rotate_counter_clockwise(degrees)
+            return True
+        except Exception as err:
+            print(err)
+            return False

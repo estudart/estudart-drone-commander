@@ -1,5 +1,7 @@
-from typing import Optional
+from __future__ import annotations
+
 from queue import Queue
+from typing import Optional, Tuple
 
 from src.infrastructure.tello_adapter import TelloAdapter
 from src.application.services.drone_commander import DroneCommander
@@ -10,9 +12,9 @@ _tello_adapter: Optional[TelloAdapter] = None
 _drone_commander: Optional[DroneCommander] = None
 _command_worker: Optional[CommandWorker] = None
 _speaking_service: Optional[SpeakingService] = None
-_queue: Queue = None
+_queue: Optional[Queue[Tuple[str, Optional[int]]]] = None
 
-def get_command_queue() -> Queue:
+def get_command_queue() -> Queue[Tuple[str, Optional[int]]]:
 	global _queue
 	if not _queue:
 		_queue = Queue()
