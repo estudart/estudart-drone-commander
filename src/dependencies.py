@@ -7,11 +7,13 @@ from src.infrastructure.tello_adapter import TelloAdapter
 from src.application.services.drone_commander import DroneCommander
 from src.application.services.command_worker import CommandWorker
 from src.application.services.speaking_service import SpeakingService
+from src.application.services.logging_service import LoggingService
 
 _tello_adapter: Optional[TelloAdapter] = None
 _drone_commander: Optional[DroneCommander] = None
 _command_worker: Optional[CommandWorker] = None
 _speaking_service: Optional[SpeakingService] = None
+_logging_service: Optional[LoggingService] = None
 _queue: Optional[Queue[Tuple[str, Optional[int]]]] = None
 
 def get_command_queue() -> Queue[Tuple[str, Optional[int]]]:
@@ -19,6 +21,12 @@ def get_command_queue() -> Queue[Tuple[str, Optional[int]]]:
 	if not _queue:
 		_queue = Queue()
 	return _queue
+
+def get_logging_service() -> LoggingService:
+	global _logging_service
+	if not _logging_service:
+		_logging_service = LoggingService()
+	return _logging_service
 
 def get_speaking_service() -> SpeakingService:
 	global _speaking_service
@@ -29,7 +37,8 @@ def get_speaking_service() -> SpeakingService:
 def get_tello_adapter() -> TelloAdapter:
 	global _tello_adapter
 	if not _tello_adapter:
-		_tello_adapter = TelloAdapter()
+		logging_service = get_logging_service()
+		_tello_adapter = TelloAdapter(logging_service=logging_service)
 	return _tello_adapter
 
 def get_drone_commander() -> DroneCommander:
@@ -37,12 +46,14 @@ def get_drone_commander() -> DroneCommander:
 	if not _drone_commander:
 		tello_adapter = get_tello_adapter()
 		speaking_service = get_speaking_service()
+		logging_service = get_logging_service()
 		command_worker = get_command_worker()
 		command_queue = get_command_queue()
 
 		_drone_commander = DroneCommander(
 			tello_adapter=tello_adapter,
 			speaking_service=speaking_service,
+			logging_service=logging_service,
 			command_worker=command_worker,
 			command_queue=command_queue
 		)
@@ -52,10 +63,12 @@ def get_command_worker() -> CommandWorker:
 	global _command_worker
 	if not _command_worker:
 		tello_adapter = get_tello_adapter()
+		logging_service = get_logging_service()
 		command_queue = get_command_queue()
 
 		_command_worker = CommandWorker(
 			tello_adapter=tello_adapter,
+			logging_service=logging_service,
 			command_queue=command_queue
 		)
 	return _command_worker

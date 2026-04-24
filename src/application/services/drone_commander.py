@@ -10,6 +10,7 @@ import pygame
 from src.infrastructure.tello_adapter import TelloAdapter
 from src.application.services.command_worker import CommandWorker
 from src.application.services.speaking_service import SpeakingService
+from src.application.services.logging_service import LoggingService
 
 class DroneCommander:
 	"""UI loop (pygame) + video loop (OpenCV) that enqueues flight commands."""
@@ -18,11 +19,13 @@ class DroneCommander:
 		self, 
 		tello_adapter: TelloAdapter,
 		speaking_service: SpeakingService,
+		logging_service: LoggingService,
 		command_worker: CommandWorker,
 		command_queue: Queue[Tuple[str, Optional[int]]],
 	) -> None:
 		self.tello_adapter = tello_adapter
 		self.speaking_service = speaking_service
+		self.logging_service = logging_service
 		self.command_worker = command_worker
 		self.command_queue = command_queue
 		pygame.init()
@@ -35,41 +38,41 @@ class DroneCommander:
 	def handle_keydown(self, event_key: int, distance: int = 60) -> None:
 		"""Map keyboard keys to queued commands (distance in centimeters)."""
 		if event_key == pygame.K_w:
-			print('w')
+			self.logging_service.info("Command: forward")
 			self.command_queue.put(("w", distance))
 			self.speaking_service.text_to_voice(f"You have moved forward {distance} centimeters")
 		elif event_key == pygame.K_a:
-			print('a')
+			self.logging_service.info("Command: left")
 			self.command_queue.put(("a", distance))
 			self.speaking_service.text_to_voice(f"You have moved left {distance} centimeters")
 		elif event_key == pygame.K_s:
-			print('s')
+			self.logging_service.info("Command: back")
 			self.command_queue.put(("s", distance))
 			self.speaking_service.text_to_voice(f"You have moved backward {distance} centimeters")
 		elif event_key == pygame.K_d:
-			print('d')
+			self.logging_service.info("Command: right")
 			self.command_queue.put(("d", distance))
 			self.speaking_service.text_to_voice(f"You have moved right {distance} centimeters")
 		elif event_key == pygame.K_UP:
-			print('+')
+			self.logging_service.info("Command: up")
 			self.command_queue.put(("+", distance))
 			self.speaking_service.text_to_voice(f"You have moved up {distance} centimeters")
 		elif event_key == pygame.K_DOWN:
-			print('-')
+			self.logging_service.info("Command: down")
 			self.command_queue.put(("-", distance))
 			self.speaking_service.text_to_voice(f"You have moved down {distance} centimeters")
 		elif event_key == pygame.K_r:
-			print('r')
+			self.logging_service.info("Command: rotate right")
 			self.command_queue.put(("rotate_right", 90))
 			self.speaking_service.text_to_voice("You have rotated right 90 degrees")
 		elif event_key == pygame.K_l:
-			print('l')
+			self.logging_service.info("Command: rotate left")
 			self.command_queue.put(("rotate_left", 90))
 			self.speaking_service.text_to_voice("You have rotated left 90 degrees")
 
 	def handle_stop(self) -> None:
 		self.running = False
-		print("Stop pressed")
+		self.logging_service.info("Stop pressed")
 		self.command_queue.put(("del", None))
 		self.speaking_service.text_to_voice("You have landed the drone")
 		cv2.destroyAllWindows()
@@ -99,7 +102,7 @@ class DroneCommander:
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN:
 					battery = self.tello_adapter.get_battery()
-					print(f"battery: {battery}%")
+					self.logging_service.info(f"Battery: {battery}%")
 					if event.key == pygame.K_0:
 						self.handle_stop()
 						break
