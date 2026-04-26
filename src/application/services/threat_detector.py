@@ -16,7 +16,7 @@ class ThreatDetector:
         camera_adapter: CameraAdapter,
         redis_adapter: RedisAdapter,
         logging_service: LoggingService,
-        confidence_threshold: float = 0.60,
+        confidence_threshold: float = 0.80,
         threat_labels: tuple[str, ...] = ("Knife", "gun"),
         model_path: str = "weights/weapon-detection-yolov8n-v2-best.pt",
         imgsz: int = 960,
@@ -42,11 +42,21 @@ class ThreatDetector:
 
         self._model = YOLO(str(model_local_path))
         self._imgsz = imgsz
+
+        self._latest_threat_event_time = 0
+        self._cooldown = 60
     
     def handle_stop(self):
         self._is_active = False
 
     def handle_threat_detection(self):
+        now = time.time()
+
+        if now - self._latest_threat_event_time < self._cooldown:
+            return
+
+        self._latest_threat_event_time = now
+
         self._logging_service.info("Threat detected")
         self._redis_adapter.publish(
             channel="threat",
