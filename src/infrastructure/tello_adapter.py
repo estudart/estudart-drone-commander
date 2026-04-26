@@ -52,6 +52,7 @@ class TelloAdapter:
     def take_off(self) -> bool:
         try:
             self.tello.takeoff()
+            self.logging_service.info(f"Battery: {self.get_battery()}")
             time.sleep(5)
             return True
         except Exception as err:
