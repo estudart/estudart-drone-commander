@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import logging
 from typing import Optional
 
@@ -13,7 +12,7 @@ class LoggingService:
 
         if not self._logger.handlers:
             handler = logging.StreamHandler()
-            formatter = logging.Formatter("[%(levelname)s] %(message)s")
+            formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s")
             handler.setFormatter(formatter)
             self._logger.addHandler(handler)
 
